@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :newSession, only: [:login]
   before_action :check_user_is_admin, only: [:update, :destroy]
+  before_action :update_user_balance, only: [:show, :update]
 
   def login
     username = params[:username]
@@ -42,8 +43,18 @@ class UsersController < ApplicationController
   end
 
   def index
-    @users = User.all
-    render json: @users
+    # @users = User.all
+    # render json: @users
+    User.all.each do |user|
+      total_balance = user.accounts.sum(:balance)
+      user.update(total_balance: total_balance)
+    end
+
+    # Render the response with updated user data
+    @users = User.all.includes(accounts: :bank)
+    render json: @users.as_json(include: { accounts: {
+                                  include: :bank,
+                                } })
   end
 
   def show
@@ -148,5 +159,11 @@ class UsersController < ApplicationController
              }, status: :unauthorized
       return
     end
+  end
+
+  def update_user_balance
+    @user = User.find(params[:id])
+    total_balance = @user.accounts.sum(:balance)
+    @user.update(total_balance: total_balance)
   end
 end

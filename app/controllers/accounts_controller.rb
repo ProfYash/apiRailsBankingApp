@@ -125,11 +125,10 @@ class AccountsController < ApplicationController
   end
 
   def set_params_for_any_transactions
-    puts "set_params_for_any_transactions1111111111111111111111111111"
     @from_account_id = params[:account_id]
     @to_account_id = params["to_account_id"]
     @amount = params["amount"]
-    if !@amount
+    if !@amount || @amount < 0
       render json: {
         status: { code: 400, message: "amount Not Found" },
       }, status: :unauthorized
@@ -137,10 +136,6 @@ class AccountsController < ApplicationController
     end
     @to_account = Account.find(@to_account_id)
     @from_account = Account.find(@from_account_id)
-    puts "to_account111111111111111111111111111111111111@@@@@@@@@@2"
-    puts @to_account.inspect
-    puts "from_account1111111111111111111111111111111111@@@@@@@@22"
-    puts @from_account.inspect
     if !@to_account
       render json: @to_account.errors, status: :unprocessable_entity
       return
