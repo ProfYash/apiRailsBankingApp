@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *default
+  database: RailsApiBankingApp_development
+  username: postgres
+  password: root
+
+production:
+  <<: *default
+  database: RailsApiBankingApp_production
+  username: postgres
+  password: root
